@@ -1,6 +1,14 @@
 from socket import *
 serverPort = 12000
 
+def parse_packet(payload):
+    #split payload into length and sentence
+    sentence_len = int(sentence[0] + sentence[1])
+    print("msg_length: ", sentence_len)
+    sentence_content = sentence[2:]
+    print("processed: ", sentence_content)
+    return sentence_content
+
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 print("Server now running on port", serverPort, ".")
@@ -12,13 +20,8 @@ while True:
     print("CONNECTED: ", str(addr[0]))
 
     sentence = conn_Socket.recv(64).decode()
-    #split payload into length and sentence
-    sentence_len = int(sentence[0] + sentence[1])
-    print("msg_length: ", sentence_len)
-    sentence_content = sentence[2:]
-    print("processed: ", sentence_content)
-
-    new_sentence = sentence_content.upper()
+    parsed_input = parse_packet(sentence)
+    new_sentence = parsed_input.upper()
     #uppercase sentence
     new_len = len(new_sentence)
     #track length for print output...
@@ -26,4 +29,4 @@ while True:
     conn_Socket.send(new_sentence.encode())
     print("msg_len_sent: ", new_len)
     conn_Socket.close()
-    print("Connection Closed.")
+    print("Connection Closed.\n")
