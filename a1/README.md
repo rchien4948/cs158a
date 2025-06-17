@@ -1,5 +1,5 @@
 # Running programs:
-First, run myvlserver.py in a terminal. This will run the server program on localhost, at port 12000. Then, run myvlclient.py, and enter a sentence to send to the server. Both programs will exit when a sentence is sent and received by the client. 
+First, run myvlserver.py in a terminal. This will run the server program on localhost, at port 12000. Then, run myvlclient.py, and enter a sentence to send to the server. Client program will exit when a sentence is sent and received. Server will continuously listen for client connections until manually terminated. 
 
 # Execution Example: 
 ## Server side:
