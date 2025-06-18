@@ -3,9 +3,9 @@ serverPort = 12000
 
 def parse_packet(payload):
     #split payload into length and sentence
-    sentence_len = int(sentence[0] + sentence[1])
+    sentence_len = int(payload[0] + payload[1])
     print("msg_length: ", sentence_len)
-    sentence_content = sentence[2:]
+    sentence_content = payload[2:]
     print("processed: ", sentence_content)
     return sentence_content
 

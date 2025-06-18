@@ -18,8 +18,9 @@ clientSocket = socket(AF_INET, SOCK_STREAM)
 #Connecting
 clientSocket.connect((serverName, serverPort))
 
-message = input('Input sentence (in lowercase): ')
-msg_full = package_msg(message)
+message = input('Input sentence (in lowercase): ') #CORRECTION: assume length is already added to front of sentence
+# msg_full = package_msg(message)
+msg_full = message
 
 #Send message
 clientSocket.send(msg_full.encode())
