@@ -1,14 +1,41 @@
 from socket import *
+import threading
 
 serverName = input('Enter Server Name: ')
-serverPort = input('Enter Server Port: ')
+serverPort = int(input('Enter Server Port: '))
 
 #TCP Socket Specs
 clientSocket = socket(AF_INET, SOCK_STREAM)
 #Connecting
-clientSocket.connect((serverName, serverPort))
+clientSocket.connect((serverName, serverPort)) 
+print("Connected to chat server. Type 'exit' to leave.")
 
+def receive_messages():
+    while True:
+        try:
+            message = clientSocket.recv(1024).decode()
+            if not message:
+                print("Disconnected from server.")
+                break
+            print("\nReceived:", message)
+        except:
+            print("Connection error.")
+            break
 
-chat_message = input('Input sentence (in lowercase): ')
-#Send message
-clientSocket.send(chat_message.encode())
+def send_messages():
+    while True:
+        message = input()
+        if message.lower() == "exit":
+            clientSocket.close()
+            break
+        try:
+            clientSocket.send(message.encode())
+        except:
+            print("Failed to send message.")
+            break
+
+recv_thread = threading.Thread(target=receive_messages)
+send_thread = threading.Thread(target=send_messages)
+
+recv_thread.start()
+send_thread.start()
