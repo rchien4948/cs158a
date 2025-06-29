@@ -6,7 +6,8 @@ serverPort = 12000
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', serverPort))
-print("Server now listening at:", serverPort, ".")
+ip, port = serverSocket.getsockname()
+print(f"Server now listening at {ip}:{port}")
 
 #For each new connection, start a new thread and print out connection message with IP and port of client
 clients = []  # List of (conn, addr) tuples
@@ -31,9 +32,8 @@ def handle_client(conn, addr):
             message = conn.recv(1024).decode()
             if not message:
                 break  # Client disconnected
-
-            print(f"From {addr}: {message}")
-            broadcast(message, sender_conn=conn)
+            print(f"{addr[1]}: {message}")
+            broadcast(f"{addr[1]}: {message}", sender_conn=conn)
     except Exception as e:
         print(f"Error with {addr}: {e}")
     finally:

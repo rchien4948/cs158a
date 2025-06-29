@@ -17,15 +17,16 @@ def receive_messages():
             if not message:
                 print("Disconnected from server.")
                 break
-            print("\nReceived:", message)
+            print(message)
         except:
-            print("Connection error.")
+            # print("Connection error.")
             break
 
 def send_messages():
     while True:
         message = input()
         if message.lower() == "exit":
+            print("Disconnected from Server")
             clientSocket.close()
             break
         try:
