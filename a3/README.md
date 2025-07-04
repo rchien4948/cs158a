@@ -14,7 +14,7 @@ Agreement: all other processes know who the leader is.
 ## Generating Unique ID
 A Universally Unique Identifier (UUID) is a 128-bit label used for identification in computer systems.
 When generated according to the standard methods, UUIDs are, for practical purposes, unique.
-We are going to use the 'uuid.uuid4()' method to decide an ID of a process
+We are going to use the ```uuid.uuid4()``` method to decide an ID of a process
 ## Node Configuration
 We assume an asynchronous non-anonymous ring.
 Each node has exactly two neighbors.
@@ -69,13 +69,13 @@ When a process sends a message, it should clearly show, on a log file,
 "Sent"
 uuid in the message
 flag
-    Received: uuid=f81d4fae-7dec-11d0-a765-00a0c91e6bf6, flag=0, less, 0
+    ```Received: uuid=f81d4fae-7dec-11d0-a765-00a0c91e6bf6, flag=0, less, 0
     Received: uuid=f81d4fae-dddd-11d0-a765-00a0c91e6bf6, flag=0, greater, 0
-    Sent: uuid=f81d4fae-dddd-11d0-a765-00a0c91e6bf6, flag=0
+    Sent: uuid=f81d4fae-dddd-11d0-a765-00a0c91e6bf6, flag=0```
     ...
     ...
-    Leader is decided to f81d4fae-dddd-11d0-a765-00a0c91e6bf6.
-    Sent: uuid=f81d4fae-dddd-11d0-a765-00a0c91e6bf6, flag=1
+    ```Leader is decided to f81d4fae-dddd-11d0-a765-00a0c91e6bf6.
+    Sent: uuid=f81d4fae-dddd-11d0-a765-00a0c91e6bf6, flag=1```
 ...
 ## Demo
 Using three duplicates of your process implementation, create a ring and execute the election process.
