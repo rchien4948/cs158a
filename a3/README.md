@@ -23,8 +23,8 @@ As a server, you will wait for another node to connect to your node.
 As a client, you will connect to another node.
 You will exchange a pair of IP address and port number outside of the code in class.
 You prepare a simple text file config.txt in the same directory as the code. The configuration file should look like:
-    10.1.1.1,5001
-    10.1.1.2,5001
+    ```10.1.1.1,5001
+    10.1.1.2,5001```
 The first line should include your IP address (as a server).
 The second line is the info exchanged with another student (as a client).
 When you run the code, the configuration file should be used to initialize the connections. (You may want to set a reasonable length of sleep time to wait for a server node to be up.)
