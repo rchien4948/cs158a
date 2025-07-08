@@ -55,7 +55,7 @@ def handle_message(msg):
         return
 
     if msg.uuid == MY_UUID:
-        print(f"[{MY_PORT}] I am the leader! 🎉")
+        print(f"[{MY_PORT}] I am the leader!")
         leader_uuid = MY_UUID
         leader_elected.set()
         announce_leader()
@@ -67,10 +67,11 @@ def handle_message(msg):
 
 #The server thread
 def server_thread():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server = socket(AF_INET, SOCK_STREAM)
+    # server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((MY_IP, MY_PORT))
-    server.listen()
+    server.listen(1)
     print(f"[{MY_PORT}] Listening on {MY_IP}:{MY_PORT}...")
 
     while not leader_elected.is_set():
@@ -85,7 +86,7 @@ def server_thread():
 
 def forward_message(msg):
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((NEIGHBOR_IP, NEIGHBOR_PORT))
             s.sendall(msg.to_json().encode())
         print(f"[{MY_PORT}] Forwarded message UUID={msg.uuid}, Flag={msg.flag}")
@@ -99,7 +100,7 @@ def announce_leader():
 def initiate_election():
     try:
         msg = Message(MY_UUID, 0)
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((NEIGHBOR_IP, NEIGHBOR_PORT))
             s.sendall(msg.to_json().encode())
         print(f"[{MY_PORT}] Sent initial election message.")
