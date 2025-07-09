@@ -3,8 +3,10 @@ This is an implementation of the Leader Election Problem, using the $O(n^2)$ alg
 
 ## Config.txt setup
 Each config.txt should look like:
-    10.1.1.1,5001
-    10.1.1.2,5001
+```    
+10.1.1.1,5001
+10.1.1.2,5001
+```
 where the first line is the IP/port used for the server portion, and the second line is where the process will look to connect as a client. 
 
 ## Setting up multiple nodes
