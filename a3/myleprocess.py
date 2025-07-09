@@ -68,7 +68,12 @@ def handle_message(msg):
     elif msg.uuid not in received_uuids:
         participated = True
         received_uuids.add(msg.uuid)
-        forward_message(msg)
+        if msg.uuid > MY_UUID: #incoming message has greater UUID, forward it
+            print(f"[{MY_PORT}] Incoming UUID {msg.uuid} beats mine {MY_UUID}, forwarding!.")
+            forward_message(msg)
+        #incoming message has smaller UUID, nothing happens
+        else:
+            print(f"[{MY_PORT}] Lesser UUID {msg.uuid} than mine {MY_UUID}, ignored.")    
     else:
         print(f"[{MY_PORT}] Duplicate UUID {msg.uuid} ignored.")
 
