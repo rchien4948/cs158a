@@ -1,0 +1,8 @@
+Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0
+Received: uuid=da284695-53e1-4746-ac73-16a7804973f1, flag=0, less, 0
+Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0, same, 1
+Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+Leader determined to be dc1be3d1-efcf-4d66-8cb9-0741bdf06e69!
+Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+Final elected leader UUID: dc1be3d1-efcf-4d66-8cb9-0741bdf06e69

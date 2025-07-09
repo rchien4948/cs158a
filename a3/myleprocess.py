@@ -8,6 +8,9 @@ import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, "config.txt")
+LOG_PATH = os.path.join(BASE_DIR, "log.txt")
+log_lock = threading.Lock()
+# recv_count = 0  # global counter for received messages
 #First, open and read the config file
 #The first line is the server address. Second line is the client address. 
 def load_config():
@@ -23,6 +26,11 @@ def load_config():
 (MY_IP, MY_PORT), (NEIGHBOR_IP, NEIGHBOR_PORT) = load_config()
 MY_UUID = str(uuid.uuid4())
 print(f"Initialized: [{MY_PORT}] UUID: {MY_UUID}")
+
+def log_line(entry):
+    with log_lock:
+        with open(LOG_PATH, "a") as log_file:
+            log_file.write(entry + "\n")
 
 class Message:
     def __init__(self, uuid_str, flag):
@@ -50,17 +58,21 @@ def handle_message(msg):
     global leader_uuid
     global participated
 
+    # recv_count += 1
     print(f"[{MY_PORT}] Received: UUID={msg.uuid}, Flag={msg.flag}")
-
     if msg.flag == 1:
         print(f"[{MY_PORT}] Leader already elected: {msg.uuid}")
+        log_line(f"Received: uuid={msg.uuid}, flag=1") #flag 1, show leader's UUID
         leader_uuid = msg.uuid
+        log_line(f"Leader determined to be {leader_uuid}!")
         leader_elected.set()
         forward_message(msg)
         return
-
+    
+    log_entry = f"Received: uuid={msg.uuid}, flag=0" #flag 0 log messages baseplate
     if msg.uuid == MY_UUID:
         print(f"[{MY_PORT}] I am the leader!")
+        log_line(log_entry + ", same, 1") #Received: uuid={}, flag=0, same, 1
         leader_uuid = MY_UUID
         leader_elected.set()
         announce_leader()
@@ -70,9 +82,10 @@ def handle_message(msg):
         received_uuids.add(msg.uuid)
         if msg.uuid > MY_UUID: #incoming message has greater UUID, forward it
             print(f"[{MY_PORT}] Incoming UUID {msg.uuid} beats mine {MY_UUID}, forwarding!.")
+            log_line(log_entry + ", greater, 0") #Received: uuid={}, flag=0, greater, 0
             forward_message(msg)
-        #incoming message has smaller UUID, nothing happens
-        else:
+        else: #incoming message has smaller UUID, nothing happens
+            log_line(log_entry + ", less, 0")
             print(f"[{MY_PORT}] Lesser UUID {msg.uuid} than mine {MY_UUID}, ignored.")    
     else:
         print(f"[{MY_PORT}] Duplicate UUID {msg.uuid} ignored.")
@@ -109,11 +122,12 @@ def forward_message(msg):
         with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((NEIGHBOR_IP, NEIGHBOR_PORT))
             s.sendall(msg.to_json().encode())
+        log_line(f"Sent: uuid={msg.uuid}, flag={msg.flag}")
         print(f"[{MY_PORT}] Forwarded message UUID={msg.uuid}, Flag={msg.flag}")
     except Exception as e:
         print(f"[{MY_PORT}] Forwarding failed: {e}")
 
-def announce_leader():
+def announce_leader(): #switch flag to 1, broadcast to others!
     msg = Message(MY_UUID, 1)
     forward_message(msg)
 
@@ -125,6 +139,7 @@ def initiate_election():
             s.connect((NEIGHBOR_IP, NEIGHBOR_PORT))
             s.sendall(msg.to_json().encode())
         print(f"[{MY_PORT}] Sent initial election message.")
+        log_line(f"Sent: uuid={msg.uuid}, flag={msg.flag}")
         participated = True
         for buffered_msg in message_buffer:
             handle_message(buffered_msg)
@@ -146,6 +161,7 @@ if __name__ == "__main__":
         while not leader_elected.is_set():
             time.sleep(0.5)
         print(f"[{MY_PORT}] Final elected leader UUID: {leader_uuid}")
+        log_line(f"Final elected leader UUID: {leader_uuid}")
         time.sleep(1)  # Give time for any last messages to be printed
     except KeyboardInterrupt: pass
     finally:
