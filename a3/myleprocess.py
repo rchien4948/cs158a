@@ -42,9 +42,13 @@ received_uuids = set()
 leader_uuid = None
 leader_elected = threading.Event()
 
+message_buffer = []       # list or Queue to hold Message objects
+participated = False      # flag to indicate if initial election message was sent
+
 #Message Handling
 def handle_message(msg):
     global leader_uuid
+    global participated
 
     print(f"[{MY_PORT}] Received: UUID={msg.uuid}, Flag={msg.flag}")
 
@@ -52,6 +56,7 @@ def handle_message(msg):
         print(f"[{MY_PORT}] Leader already elected: {msg.uuid}")
         leader_uuid = msg.uuid
         leader_elected.set()
+        forward_message(msg)
         return
 
     if msg.uuid == MY_UUID:
@@ -59,28 +64,38 @@ def handle_message(msg):
         leader_uuid = MY_UUID
         leader_elected.set()
         announce_leader()
+
     elif msg.uuid not in received_uuids:
+        participated = True
         received_uuids.add(msg.uuid)
         forward_message(msg)
     else:
         print(f"[{MY_PORT}] Duplicate UUID {msg.uuid} ignored.")
 
+def handle_connection(conn):
+    try:
+        data = conn.recv(1024).decode()
+        conn.close()
+        msg = Message.from_json(data)
+        if not participated: #hasn't sent initial election message yet, hold received message for calculation later
+            message_buffer.append(msg)
+            print(f"[{MY_PORT}] Buffered message: UUID={msg.uuid}, Flag={msg.flag}")
+        else: handle_message(msg) #initial election message WAS sent, proceed as usual
+    except Exception as e:
+        print(f"[{MY_PORT}] Connection handling error: {e}")
 #The server thread
 def server_thread():
     server = socket(AF_INET, SOCK_STREAM)
     # server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((MY_IP, MY_PORT))
-    server.listen(1)
+    server.listen()
     print(f"[{MY_PORT}] Listening on {MY_IP}:{MY_PORT}...")
 
     while not leader_elected.is_set():
         try:
             conn, _ = server.accept()
-            data = conn.recv(1024).decode()
-            conn.close()
-            msg = Message.from_json(data)
-            handle_message(msg)
+            threading.Thread(target=handle_connection, args=(conn,), daemon=True).start() #hopefully fixes losing processes hanging
         except Exception as e:
             print(f"[{MY_PORT}] Server error: {e}")
 
@@ -98,12 +113,17 @@ def announce_leader():
     forward_message(msg)
 
 def initiate_election():
+    global participated
     try:
         msg = Message(MY_UUID, 0)
         with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((NEIGHBOR_IP, NEIGHBOR_PORT))
             s.sendall(msg.to_json().encode())
         print(f"[{MY_PORT}] Sent initial election message.")
+        participated = True
+        for buffered_msg in message_buffer:
+            handle_message(buffered_msg)
+        message_buffer.clear()
     except Exception as e:
         print(f"[{MY_PORT}] Could not connect to neighbor: {e}")
 
@@ -112,10 +132,17 @@ if __name__ == "__main__":
     threading.Thread(target=server_thread, daemon=True).start()
     time.sleep(1)
 
-    input(f"[{MY_PORT}] Press Enter to initiate election...\n")
+    countdown = 5
+    input(f"[{MY_PORT}] Press Enter to initiate election ({countdown} second countdown!)...\n")
+    time.sleep(countdown) #press enter on ALL the instances within the countdown!
     initiate_election()
 
-    while not leader_elected.is_set():
-        time.sleep(0.5)
-
-    print(f"[{MY_PORT}] Final elected leader UUID: {leader_uuid}")
+    try:
+        while not leader_elected.is_set():
+            time.sleep(0.5)
+        print(f"[{MY_PORT}] Final elected leader UUID: {leader_uuid}")
+        time.sleep(1)  # Give time for any last messages to be printed
+    except KeyboardInterrupt: pass
+    finally:
+        print(f"[{MY_PORT}] Exiting...")
+        sys.exit(0)
