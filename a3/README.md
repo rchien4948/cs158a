@@ -3,8 +3,8 @@ This is an implementation of the Leader Election Problem, using the $O(n^2)$ alg
 
 ## Config.txt setup
 Each config.txt should look like:
-    ```10.1.1.1,5001
-        10.1.1.2,5001```
+    10.1.1.1,5001
+    10.1.1.2,5001
 where the first line is the IP/port used for the server portion, and the second line is where the process will look to connect as a client. 
 
 ## Setting up multiple nodes
@@ -32,13 +32,13 @@ When running myleprocess.py, the program will wait for an 'Enter' keypress befor
     [5001] Exiting...
 
 ## Log Example: 
-Sent: uuid=25917616-5d8b-44e0-acb1-a32324b13891, flag=0
-Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0, greater, 0
-Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0
-Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
-Leader determined to be dc1be3d1-efcf-4d66-8cb9-0741bdf06e69!
-Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
-Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
-Leader determined to be dc1be3d1-efcf-4d66-8cb9-0741bdf06e69!
-Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
-Final elected leader UUID: dc1be3d1-efcf-4d66-8cb9-0741bdf06e69
+    Sent: uuid=25917616-5d8b-44e0-acb1-a32324b13891, flag=0
+    Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0, greater, 0
+    Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=0
+    Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+    Leader determined to be dc1be3d1-efcf-4d66-8cb9-0741bdf06e69!
+    Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+    Received: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+    Leader determined to be dc1be3d1-efcf-4d66-8cb9-0741bdf06e69!
+    Sent: uuid=dc1be3d1-efcf-4d66-8cb9-0741bdf06e69, flag=1
+    Final elected leader UUID: dc1be3d1-efcf-4d66-8cb9-0741bdf06e69
